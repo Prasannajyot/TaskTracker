@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Spinner, Alert, Modal, Form } from "react-bootstrap";
+import {
+  Table,
+  Button,
+  Spinner,
+  Alert,
+  Modal,
+  Form,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -137,38 +146,87 @@ const UserListScreen = () => {
             </tr>
           </thead>
           <tbody>
-            {userList.map((user) => (
-              <tr key={user.id}>
-                <td className="text-start fw-semibold px-3 py-2">
-                  {user.username}
-                </td>
-                <td className="px-3 py-2">{user.email}</td>
-                <td className="px-3 py-2">
-                  <Form.Select
-                    size="sm"
-                    value={user.role_id}
-                    onChange={(e) => handleRoleChange(user, e.target.value)}
-                    disabled={loading || isUpdatingRole}
-                    className="form-select-sm shadow-sm"
-                    style={{ minWidth: "140px" }}
-                  >
-                    <option value={1}>Admin</option>
-                    <option value={2}>Task Creator</option>
-                    <option value={3}>User</option>
-                  </Form.Select>
-                </td>
-                <td className="px-3 py-2">
-                  <Button
-                    variant="outline-danger"
-                    size="sm"
-                    onClick={() => handleDeleteClick(user.id)}
-                    disabled={loading || isUpdatingRole}
-                  >
-                    <i className="fas fa-trash me-1"></i> Delete
-                  </Button>
-                </td>
-              </tr>
-            ))}
+            {userList.map((user) => {
+              const isCurrentUser = user.id === userInfo?.user_id;
+
+              return (
+                <tr key={user.id}>
+                  <td className="text-start fw-semibold px-3 py-2">
+                    {user.username}
+                  </td>
+                  <td className="px-3 py-2">{user.email}</td>
+                  <td className="px-3 py-2">
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        isCurrentUser ? (
+                          <Tooltip
+                            id={`tooltip-role-${user.id}`}
+                            className="custom-tooltip"
+                          >
+                            You cannot change your own role
+                          </Tooltip>
+                        ) : (
+                          <></>
+                        )
+                      }
+                    >
+                      <div>
+                        <Form.Select
+                          size="sm"
+                          value={user.role_id}
+                          onChange={(e) =>
+                            handleRoleChange(user, e.target.value)
+                          }
+                          disabled={loading || isUpdatingRole || isCurrentUser}
+                          style={{
+                            minWidth: "140px",
+                            opacity: isCurrentUser ? 0.6 : 1,
+                            cursor: isCurrentUser ? "not-allowed" : "pointer",
+                          }}
+                        >
+                          <option value={1}>Admin</option>
+                          <option value={2}>Task Creator</option>
+                          <option value={3}>User</option>
+                        </Form.Select>
+                      </div>
+                    </OverlayTrigger>
+                  </td>
+                  <td className="px-3 py-2">
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        isCurrentUser ? (
+                          <Tooltip
+                            id={`tooltip-delete-${user.id}`}
+                            className="custom-tooltip"
+                          >
+                            You cannot delete yourself
+                          </Tooltip>
+                        ) : (
+                          <></>
+                        )
+                      }
+                    >
+                      <div>
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          onClick={() => handleDeleteClick(user.id)}
+                          disabled={loading || isUpdatingRole || isCurrentUser}
+                          style={{
+                            opacity: isCurrentUser ? 0.6 : 1,
+                            cursor: isCurrentUser ? "not-allowed" : "pointer",
+                          }}
+                        >
+                          <i className="fas fa-trash me-1"></i> Delete
+                        </Button>
+                      </div>
+                    </OverlayTrigger>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       ) : (

@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 
 import Project from "../components/Project";
-import Loader from "../components/Loader";
 import Message from "../components/Message";
 import Paginate from "../components/Paginate";
 import { listProjects } from "../features/projectSlice";
@@ -53,26 +52,32 @@ function HomeScreen() {
       </div>
 
       {loading ? (
-        <Loader />
+        <div className="d-flex justify-content-center my-5">
+          <Spinner animation="border" />
+        </div>
       ) : error ? (
         <Message variant="danger">{error}</Message>
-      ) : (
+      ) : projects && projects.length > 0 ? (
         <>
           <div className="list-group shadow-sm rounded">
-            {(projects || []).map((project) => (
+            {projects.map((project) => (
               <Project key={project.id} project={project} />
             ))}
           </div>
 
-          <div className="d-flex justify-content-center mt-4">
-            <Paginate
-              page={page}
-              pages={pages}
-              keyword={keyword}
-              basePath="/"
-            />
-          </div>
+          {pages > 1 && (
+            <div className="d-flex justify-content-center mt-4">
+              <Paginate
+                page={page}
+                pages={pages}
+                keyword={keyword}
+                basePath="/"
+              />
+            </div>
+          )}
         </>
+      ) : (
+        <Message variant="info">No projects found.</Message>
       )}
     </div>
   );

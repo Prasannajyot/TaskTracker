@@ -1,8 +1,15 @@
 import React, { useEffect } from "react";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Card, ListGroup, Button, Badge, Row, Col } from "react-bootstrap";
-import Loader from "../components/Loader";
+import {
+  Card,
+  ListGroup,
+  Button,
+  Badge,
+  Row,
+  Col,
+  Spinner,
+} from "react-bootstrap";
 import Message from "../components/Message";
 import { listProjectDetails } from "../features/projectSlice";
 
@@ -52,7 +59,9 @@ function ProjectScreen() {
       </Link>
 
       {loading ? (
-        <Loader />
+        <div className="d-flex justify-content-center my-5">
+          <Spinner animation="border" />
+        </div>
       ) : error ? (
         <Message variant="danger">{renderError(error)}</Message>
       ) : projectData ? (
@@ -142,9 +151,6 @@ function ProjectScreen() {
                           </Badge>
                         </ListGroup.Item>
                         <ListGroup.Item>
-                          <strong>Assigned To:</strong> {task.assigned_to}
-                        </ListGroup.Item>
-                        <ListGroup.Item>
                           <strong>Priority:</strong> {task.priority}
                         </ListGroup.Item>
                         <ListGroup.Item>
@@ -160,23 +166,25 @@ function ProjectScreen() {
                       </ListGroup>
 
                       {/* Edit Task Button */}
-                      <div className="mt-auto text-end">
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          style={{
-                            backgroundColor: "#0066FF",
-                            borderColor: "#0066FF",
-                          }}
-                          onClick={() =>
-                            navigate(`/task/${task.id}/edit`, {
-                              state: { task, projectId: projectData.id },
-                            })
-                          }
-                        >
-                          Edit Task
-                        </Button>
-                      </div>
+                      {(userInfo?.role_id === 1 || userInfo?.role_id === 2) && (
+                        <div className="mt-auto text-end">
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            style={{
+                              backgroundColor: "#0066FF",
+                              borderColor: "#0066FF",
+                            }}
+                            onClick={() =>
+                              navigate(`/task/${task.id}/edit`, {
+                                state: { task, projectId: projectData.id },
+                              })
+                            }
+                          >
+                            Edit Task
+                          </Button>
+                        </div>
+                      )}
                     </Card.Body>
                   </Card>
                 </Col>

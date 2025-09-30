@@ -8,12 +8,12 @@ export const injectStore = (_store) => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: "/api",
+  baseURL: process.env.REACT_APP_API_BASE_URL + "/api",
   headers: { "Content-Type": "application/json" },
 });
 
 axiosInstance.interceptors.request.use((config) => {
-  const token = store?.getState()?.auth?.userInfo?.token;
+  const token = store?.getState()?.userLogin?.userInfo?.token;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

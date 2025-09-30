@@ -1,5 +1,5 @@
 from sqlmodel import select
-from sqlalchemy import update,func
+from sqlalchemy import update,func, desc
 from app.models.project_model import Project
 from app.models.task_model import Task
 from app.models.user_role_model import UserRole
@@ -44,7 +44,7 @@ def get_all_projects(logged_user_id, db_session, keyword: str = "", page: int = 
     pages = math.ceil(total_count / page_size) if total_count > 0 else 1
 
     # Step 6: Apply ordering, offset, and limit
-    query = query.order_by(Project.id).offset(offset).limit(page_size)
+    query = query.order_by(desc(Project.id)).offset(offset).limit(page_size)
     projects = db_session.exec(query).all()
 
     return {
@@ -61,7 +61,7 @@ def get_project_by_id(logged_user_id, db_session, project_id: int):
     
     # Get all tasks for this project
     tasks = db_session.exec(
-        select(Task).where(Task.project_id == project_id, Task.is_active == True)
+        select(Task).where(Task.project_id == project_id, Task.is_active == True).order_by(desc(Task.id))
     ).all()
     
     # Return both

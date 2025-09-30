@@ -1,9 +1,8 @@
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { LinkContainer } from "react-router-bootstrap";
-import { Table, Button, Row, Col } from "react-bootstrap";
+import { Table, Button, Row, Col, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import Loader from "../components/Loader";
 import Message from "../components/Message";
 import Paginate from "../components/Paginate";
 import { Modal } from "antd";
@@ -28,9 +27,8 @@ function ProjectListScreen() {
     success: successDelete,
   } = projectDelete;
 
-
   const projectCreate = useSelector((state) => state.projectCreate);
-  console.log("projectCreate:",projectCreate)
+  console.log("projectCreate:", projectCreate);
   const {
     loading: loadingCreate,
     error: errorCreate,
@@ -44,13 +42,20 @@ function ProjectListScreen() {
   useEffect(() => {
     if (!userInfo.isAdmin) {
       navigate("/login");
-    } 
+    }
     if (successCreate) {
       navigate(`/admin/project/${createdProject._id}/edit`);
     } else {
-        dispatch(listProjects())
+      dispatch(listProjects());
     }
-  }, [dispatch, navigate, userInfo, successDelete, successCreate, createProject]);
+  }, [
+    dispatch,
+    navigate,
+    userInfo,
+    successDelete,
+    successCreate,
+    createProject,
+  ]);
 
   const deleteHandler = (ProjectId) => {
     Modal.confirm({
@@ -66,7 +71,7 @@ function ProjectListScreen() {
   };
 
   const createProjectHandler = () => {
-    dispatch(createProject())
+    dispatch(createProject());
   };
 
   return (
@@ -81,58 +86,68 @@ function ProjectListScreen() {
           </Button>
         </Col>
       </Row>
-      {loadingDelete && <Loader />}
+      {loadingDelete && (
+        <div className="d-flex justify-content-center my-5">
+          <Spinner animation="border" />
+        </div>
+      )}
       {errorDelete && <Message variant="danger">{errorDelete}</Message>}
 
-      {loadingCreate && <Loader />}
+      {loadingCreate && (
+        <div className="d-flex justify-content-center my-5">
+          <Spinner animation="border" />
+        </div>
+      )}
       {errorCreate && <Message variant="danger">{errorCreate}</Message>}
 
       {loading ? (
-        <Loader />
+        <div className="d-flex justify-content-center my-5">
+          <Spinner animation="border" />
+        </div>
       ) : error ? (
         <Message variant="danger">{error}</Message>
       ) : (
         <div>
-        <Table striped bordered hover responsive className="table-sm">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>NAME</th>
-              <th>PRICE</th>
-              <th>CATEGORY</th>
-              <th>BRAND</th>
-              <th></th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {projects.map((project) => (
-              <tr key={project._id}>
-                <td>{project._id}</td>
-                <td>{project.name}</td>
-                <td>${project.price}</td>
-                <td>{project.category}</td>
-                <td>{project.brand}</td>
-
-                <td>
-                  <LinkContainer to={`/admin/project/${project._id}/edit`}>
-                    <Button variant="light" className="btn-sm">
-                      <i className="fas fa-edit"></i>
-                    </Button>
-                  </LinkContainer>
-                  <Button
-                    variant="danger"
-                    className="btn-sm"
-                    onClick={() => deleteHandler(project._id)}
-                  >
-                    <i className="fas fa-trash"></i>
-                  </Button>
-                </td>
+          <Table striped bordered hover responsive className="table-sm">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>NAME</th>
+                <th>PRICE</th>
+                <th>CATEGORY</th>
+                <th>BRAND</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
-        <Paginate pages={pages} page={page} isAdmin={true} />
+            </thead>
+
+            <tbody>
+              {projects.map((project) => (
+                <tr key={project._id}>
+                  <td>{project._id}</td>
+                  <td>{project.name}</td>
+                  <td>${project.price}</td>
+                  <td>{project.category}</td>
+                  <td>{project.brand}</td>
+
+                  <td>
+                    <LinkContainer to={`/admin/project/${project._id}/edit`}>
+                      <Button variant="light" className="btn-sm">
+                        <i className="fas fa-edit"></i>
+                      </Button>
+                    </LinkContainer>
+                    <Button
+                      variant="danger"
+                      className="btn-sm"
+                      onClick={() => deleteHandler(project._id)}
+                    >
+                      <i className="fas fa-trash"></i>
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <Paginate pages={pages} page={page} isAdmin={true} />
         </div>
       )}
     </div>

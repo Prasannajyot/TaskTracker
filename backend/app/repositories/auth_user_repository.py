@@ -152,7 +152,7 @@ def add_user_role(new_user_id: int, user_role_id : int,
     new_user_role = UserRole(role_id=user_role_id, user_id=new_user_id)
     db_session.add(new_user_role)
     db_session.commit()
-
+    db_session.close()
 
 def get_user_id_async(email: str, db_session: AsyncSession):
     """
@@ -217,9 +217,8 @@ def delete_user(logged_user_id, user_id, session):
     session.execute(task_stmt)
     
     # Update role_id as null in userrole table where user_id = user_id
-    userrole_stmt = update(UserRole).where(UserRole.user_id == user_id).values(role_id=3)
-    session.execute(userrole_stmt)
-    
+    user_role = UserRole(user_id=user_id, role_id=3)
+    session.merge(user_role)  # merge handles insert or update automatically
     session.commit()
     
     return {"message": f"User {user_id} tasks and roles updated successfully"}

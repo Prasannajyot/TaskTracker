@@ -13,7 +13,7 @@ from app.dto.add_user_dto import AddUser
 from app.services.login_service import get_password_hash
 from app.auth.auth_bearer import JWTBearer
 from app.services.login_service import get_current_user
-from app.repositories.auth_user_repository import get_user_details_by_id, update_user_profile
+from app.repositories.auth_user_repository import get_user_details_by_id, add_user_role
 import logging
 import time
 
@@ -111,18 +111,20 @@ async def add_user(adduser: AddUser, db_session: Session = Depends(get_session),
         result)
 
 
-@router.post("/add_user_test/{username}/{password}/{f_name}/{l_name}")
+@router.post("/add_user_test/{email}/{username}/{password}/{f_name}/{l_name}")
 async def add_user(
-        username: str, password: str, f_name: str, l_name: str,
+        email: str,username: str, password: str, f_name: str, l_name: str,
         db_session: Session = Depends(get_session)):
     """
         add a new user
     """
     new_user = User(first_name=f_name, last_name=l_name,
-                    email=username, password=get_password_hash(password), is_superuser=0, username=username,
+                    email=email, password=get_password_hash(password), is_superuser=0, username=username,
                     is_active=True, is_staff=True)
     db_session.add(new_user)
     db_session.commit()
+    add_user_role(new_user.id, 3, db_session)
+    
     db_session.close()
     return res.create_response(
         "New test user added successfully",

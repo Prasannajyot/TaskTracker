@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import Loader from "../components/Loader";
 import FormContainer from "../components/FormContainer";
 import {
   fetchTaskDetails,
@@ -14,7 +13,6 @@ import { fetchUsers } from "../features/userSlice";
 import { listProjectDetails } from "../features/projectSlice";
 
 function TaskEditScreen() {
-  
   const { taskId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -28,11 +26,10 @@ function TaskEditScreen() {
   const { users } = useSelector((state) => state.getUsers);
 
   useEffect(() => {
-  console.log("taskId from URL:", taskId);
-  console.log("initialTask from location.state:", initialTask);
-  console.log("projectId from location.state:", projectId);
-}, [taskId, initialTask, projectId]);
-
+    console.log("taskId from URL:", taskId);
+    console.log("initialTask from location.state:", initialTask);
+    console.log("projectId from location.state:", projectId);
+  }, [taskId, initialTask, projectId]);
 
   const topRef = useRef(null);
 
@@ -66,7 +63,7 @@ function TaskEditScreen() {
     }
 
     if (userInfo?.token) {
-      dispatch(fetchUsers({ roleId: 3, token: userInfo.token }));
+      dispatch(fetchUsers(3));
     }
   }, [dispatch, taskId, userInfo?.token, initialTask]);
 
@@ -130,7 +127,11 @@ function TaskEditScreen() {
 
       <FormContainer>
         <h1>{taskId ? "Edit Task" : "Create Task"}</h1>
-        {loading && <Loader />}
+        {loading && (
+          <div className="d-flex justify-content-center my-5">
+            <Spinner animation="border" />
+          </div>
+        )}
         {error && <Alert variant="danger">{error}</Alert>}
         {showSuccess && (
           <Alert variant="success">Task updated successfully!</Alert>
@@ -210,19 +211,6 @@ function TaskEditScreen() {
             </Form.Select>
           </Form.Group>
 
-          {/* Project ID */}
-          <Form.Group controlId="projectId" className="mb-3">
-            <Form.Label>Project ID</Form.Label>
-            <Form.Control
-              type="number"
-              name="project_id"
-              value={formData.project_id}
-              onChange={handleChange}
-              required
-              disabled
-            />
-          </Form.Group>
-
           {/* Start Date */}
           <Form.Group controlId="startDate" className="mb-3">
             <Form.Label>
@@ -231,7 +219,7 @@ function TaskEditScreen() {
             <Form.Control
               type="date"
               name="start_date"
-              min={new Date().toISOString().split("T")[0]}
+              min={taskId ? undefined : new Date().toISOString().split("T")[0]}
               value={formData.start_date}
               onChange={handleChange}
               required

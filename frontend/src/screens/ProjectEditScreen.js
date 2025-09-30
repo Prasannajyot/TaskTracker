@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import Loader from "../components/Loader";
 import Message from "../components/Message";
 import FormContainer from "../components/FormContainer";
 import {
@@ -81,7 +80,11 @@ function ProjectEditScreen() {
       </Button>
       <FormContainer>
         <h1>{isEditMode ? "Edit Project" : "Create Project"}</h1>
-        {loading && <Loader />}
+        {loading && (
+          <div className="d-flex justify-content-center my-5">
+            <Spinner animation="border" />
+          </div>
+        )}
         {error && <Message variant="danger">{error}</Message>}
         <Form onSubmit={submitHandler}>
           <Form.Group controlId="name" className="mb-3">
@@ -117,6 +120,7 @@ function ProjectEditScreen() {
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               required
+              disabled={isEditMode}
             />
           </Form.Group>
 
@@ -128,9 +132,7 @@ function ProjectEditScreen() {
               type="date"
               name="due_date"
               value={endDate}
-              min={
-              startDate || new Date().toISOString().split("T")[0]
-              }
+              min={startDate || new Date().toISOString().split("T")[0]}
               onChange={(e) => setEndDate(e.target.value)}
               disabled={!startDate}
             />

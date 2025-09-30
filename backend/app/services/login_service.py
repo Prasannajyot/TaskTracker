@@ -186,28 +186,26 @@ def token_create_user(data_obj, session):
     """
     create user if user not exists
     """
-    print("data_obj:",data_obj)
-    random_password = get_random_password(length=8)
     logger.info("random_password generated for user %s: %s", data_obj['email'], random_password)
     new_user = User(
         username=data_obj['username'],
         email=data_obj['email'],
         first_name=data_obj['first_name'],
         last_name=data_obj['last_name'],
-        password=get_password_hash(random_password),
-        is_active=True
+        password=get_password_hash(os.getenv("SSO_DEFAULT_PASSWORD")),
+        is_active=True,
+        is_sso_user=1
     )
     session.add(new_user)
     session.commit()
     session.refresh(new_user)
-    print("new_user:",new_user.id)
+
     new_user_role = UserRole(role_id=3, user_id=new_user.id)
-    print("new_user_role:",new_user_role)
     session.add(new_user_role)
     session.commit()
     new_user = {
         "id": new_user.id,
-        "sub": str(new_user.id),  # optional: if you want sub claim
+        "sub": str(new_user.id),
         "email": new_user.email,
         "username": new_user.username,
         "first_name": new_user.first_name,

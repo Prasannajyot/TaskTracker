@@ -65,7 +65,7 @@ const { userInfo, loading, error } = useSelector(
 
       <Row className="py-3">
         <Col>
-          New Customer?{" "}
+          New User?{" "}
           <Link to={redirect ? `/register?redirect=${redirect}` : "/register"}>
             Register
           </Link>

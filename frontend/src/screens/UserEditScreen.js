@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import Loader from "../components/Loader";
 import Message from "../components/Message";
 import { getUserById, updateUser } from "../features/authSlice";
 import FormContainer from "../components/FormContainer";
@@ -51,11 +50,17 @@ function UserEditScreen() {
       <Link to="/admin/userlist">Go Back</Link>
       <FormContainer>
         <h1>Edit User</h1>
-        {loadingUpdate && <Loader />}
+        {loadingUpdate && (
+          <div className="d-flex justify-content-center my-5">
+            <Spinner animation="border" />
+          </div>
+        )}
         {errorUpdate && <Message variant="danger">{errorUpdate}</Message>}
 
         {loading ? (
-          <Loader />
+          <div className="d-flex justify-content-center my-5">
+            <Spinner animation="border" />
+          </div>
         ) : error ? (
           <Message variant="danger">{error}</Message>
         ) : (
